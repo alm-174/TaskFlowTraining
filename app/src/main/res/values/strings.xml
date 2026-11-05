@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">TaskFlowTraining</string>
+    <string name="title_hint">Nhập tên công việc</string>
+    <string name="add_task">Thêm công việc</string>
+
+    <string name="name_required">Vui lòng nhập tên</string>
+    <string name="email_required">Vui lòng nhập email</string>
+    <string name="email_invalid">Email không hợp lệ</string>
+    <string name="password_required">Vui lòng nhập mật khẩu</string>
+    <string name="register_success">Đăng ký hợp lệ!</string>
+    <string name="initial_count">0</string>
+    <string name="increase">+</string>
+    <string name="decrease">-</string>
+    <string name="reset">Reset</string>
+    <string name="register_title">Đăng ký tài khoản</string>
+    <string name="name_hint">Nhập họ và tên</string>
+    <string name="email_hint">Nhập email</string>
+    <string name="password_hint">Nhập mật khẩu</string>
+    <string name="confirm_password_hint">Xác nhận mật khẩu</string>
+    <string name="phone_hint">Nhập số điện thoại</string>
+    <string name="register">Đăng ký</string>
+    <string name="age_hint">Nhập tuổi</string>
+    <string name="open_profile">Mở Profile</string>
+    <string name="return_result">Trả kết quả</string>
+    <string name="invalid_age">Vui lòng nhập tuổi hợp lệ</string>
+
+</resources>
