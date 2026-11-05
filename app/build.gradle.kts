@@ -57,4 +57,5 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.2.1")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
 }
