@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/btnLoadTodos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tải 10 Todo từ API" />
+
+    <EditText
+        android:id="@+id/edtTodoId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nhập id todo"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btnFindTodo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tìm Todo theo ID" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Nhấn nút để tải dữ liệu" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tvTodos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textSize="16sp" />
+
+    </ScrollView>
+
+</LinearLayout>

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.devtools.ksp")
 }
-
 android {
     namespace = "com.example.taskflowtraining"
     compileSdk {
@@ -48,7 +48,6 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.11.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
-    implementation("androidx.recyclerview:recyclerview:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("com.squareup.retrofit2:retrofit:3.0.0")
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
@@ -58,4 +57,9 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.9")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    ksp("androidx.room:room-compiler:2.8.4")
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
 }

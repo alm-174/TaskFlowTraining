@@ -1,26 +1,53 @@
+
 package com.example.taskflowtraining
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflowtraining.databinding.FragmentTaskListBinding
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class TaskListFragment : Fragment(R.layout.fragment_task_list) {
 
     private var _binding: FragmentTaskListBinding? = null
 
-    private val binding
+    private val binding: FragmentTaskListBinding
         get() = requireNotNull(_binding)
 
-    private val tasks = mutableListOf<Task>()
-    private var nextId = 1L
+    private val viewModel: TaskViewModel by viewModels {
+        val app = requireActivity().application as TaskFlowApp
 
-    private var searchQuery = ""
-    private var currentFilter = TaskFilter.ALL
+        TaskViewModelFactory(
+            app.taskRepository,
+            app.settingsRepository
+        )
+    }
 
     private lateinit var adapter: TaskAdapter
+
+    private val priorities = listOf(
+        TaskPriority.LOW,
+        TaskPriority.MEDIUM,
+        TaskPriority.HIGH
+    )
+
+    private val sortModes = listOf(
+        SortMode.DEFAULT,
+        SortMode.TITLE_ASC,
+        SortMode.TITLE_DESC,
+        SortMode.PRIORITY_HIGH_FIRST
+    )
 
     override fun onViewCreated(
         view: View,
@@ -30,9 +57,51 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
 
         _binding = FragmentTaskListBinding.bind(view)
 
+        Log.d("TaskLifecycle", "TaskList: onViewCreated")
+
+        // 1. Nút Refresh API
+        binding.btnRefreshRemote.setOnClickListener {
+            viewModel.refreshRemote()
+        }
+
+        // 2. Thống kê dữ liệu Room
+        val dao = (requireActivity().application as TaskFlowApp)
+            .database.taskDao()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(
+                Lifecycle.State.STARTED
+            ) {
+                combine(
+                    dao.observeTaskCount(),
+                    dao.observeCompletedCount()
+                ) { total, completed ->
+                    total to completed
+                }.collect { (total, completed) ->
+
+                    binding.tvTotalTasks.text =
+                        "Tổng công việc: $total"
+
+                    binding.tvCompletedTasks.text =
+                        "Đã hoàn thành: $completed"
+
+                    val percent =
+                        if (total == 0) 0
+                        else completed * 100 / total
+
+                    binding.progressTasks.progress = percent
+                }
+            }
+        }
+
+        // 3. Khởi tạo Adapter
         adapter = TaskAdapter(
-            onToggle = { id -> toggleTask(id) },
-            onDelete = { id -> deleteTask(id) }
+            onToggle = { id ->
+                viewModel.toggle(id)
+            },
+            onDelete = { id ->
+                viewModel.delete(id)
+            }
         )
 
         binding.recyclerView.layoutManager =
@@ -40,113 +109,214 @@ class TaskListFragment : Fragment(R.layout.fragment_task_list) {
 
         binding.recyclerView.adapter = adapter
 
+        // 4. Tìm kiếm
+        binding.etSearch.setText(
+            viewModel.uiState.value.searchQuery
+        )
+
         binding.etSearch.doOnTextChanged { text, _, _, _ ->
-            searchQuery = text?.toString().orEmpty()
-            renderTasks()
+            viewModel.setSearchQuery(
+                text?.toString().orEmpty()
+            )
         }
 
+        // 5. Spinner Priority
+        val priorityLabels = listOf(
+            "Thấp",
+            "Trung bình",
+            "Cao"
+        )
+
+        val priorityAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            priorityLabels
+        )
+
+        priorityAdapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item
+        )
+
+        binding.spPriority.adapter = priorityAdapter
+        binding.spPriority.setSelection(1)
+
+        // 6. Thêm công việc
         binding.btnAdd.setOnClickListener {
             val title = binding.etTitle.text.toString()
-            val error = validateTitle(title)
 
-            if (error != null) {
-                binding.etTitle.error = error
-                return@setOnClickListener
+            val selectedPriority =
+                priorities[binding.spPriority.selectedItemPosition]
+
+            viewModel.add(title, selectedPriority)
+
+            if (title.isNotBlank()) {
+                binding.etTitle.text.clear()
             }
-
-            addTask(title)
-            binding.etTitle.text.clear()
         }
 
+        // 7. Bộ lọc
         binding.btnAll.setOnClickListener {
-            currentFilter = TaskFilter.ALL
-            renderTasks()
+            viewModel.setFilter(TaskFilter.ALL)
         }
 
         binding.btnPending.setOnClickListener {
-            currentFilter = TaskFilter.PENDING
-            renderTasks()
+            viewModel.setFilter(TaskFilter.PENDING)
         }
 
         binding.btnDone.setOnClickListener {
-            currentFilter = TaskFilter.DONE
-            renderTasks()
+            viewModel.setFilter(TaskFilter.DONE)
         }
 
-        renderTasks()
-    }
 
-    private fun validateTitle(raw: String): String? {
-        if (raw.isBlank()) {
-            return "Tên công việc không được để trống"
-        }
-        return null
-    }
-
-    private fun addTask(raw: String) {
-        if (validateTitle(raw) != null) return
-
-        tasks += Task(
-            id = nextId++,
-            title = raw.trim()
+        // 8. Spinner Sort + DataStore
+        val sortLabels = listOf(
+            "Mặc định",
+            "Tên A → Z",
+            "Tên Z → A",
+            "Ưu tiên cao trước"
         )
 
-        renderTasks()
-    }
+        val sortAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            sortLabels
+        )
 
-    private fun toggleTask(id: Long) {
-        val i = tasks.indexOfFirst { it.id == id }
+        sortAdapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item
+        )
 
-        if (i >= 0) {
-            tasks[i] = tasks[i].copy(
-                isDone = !tasks[i].isDone
-            )
-        }
+        binding.spSort.adapter = sortAdapter
 
-        renderTasks()
-    }
+        // Chưa cho Spinner ghi vào DataStore
+        // cho đến khi đã đồng bộ giá trị ban đầu
+        var spinnerReady = false
 
-    private fun deleteTask(id: Long) {
-        tasks.removeAll { it.id == id }
-        renderTasks()
-    }
+        binding.spSort.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
 
-    private fun renderTasks() {
-        val result = tasks.filter { task ->
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (!spinnerReady) return
 
-            val matchesSearch = task.title.contains(
-                searchQuery,
-                ignoreCase = true
-            )
+                    // Chỉ ghi khi người dùng chọn giá trị khác
+                    // giá trị đang có trong ViewModel
+                    val selectedMode = sortModes[position]
 
-            val matchesFilter = when (currentFilter) {
-                TaskFilter.ALL -> true
-                TaskFilter.PENDING -> !task.isDone
-                TaskFilter.DONE -> task.isDone
+                    if (selectedMode != viewModel.currentSortMode.value) {
+                        viewModel.setSortMode(selectedMode)
+                    }
+                }
+
+                override fun onNothingSelected(
+                    parent: AdapterView<*>?
+                ) {
+                }
             }
 
-            matchesSearch && matchesFilter
+        // Đọc SortMode đã lưu và cập nhật Spinner
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(
+                Lifecycle.State.STARTED
+            ) {
+                combine(
+                    viewModel.currentSortMode,
+                    viewModel.sortModeLoaded
+                ) { mode, loaded ->
+                    mode to loaded
+                }.collect { (mode, loaded) ->
+
+                    if (!loaded) return@collect
+
+                    val position = sortModes.indexOf(mode)
+
+                    if (position >= 0) {
+                        if (!spinnerReady) {
+                            // Đồng bộ lựa chọn ban đầu trước khi
+                            // bật callback lưu cài đặt
+                            binding.spSort.setSelection(position)
+                            spinnerReady = true
+                        } else if (
+                            binding.spSort.selectedItemPosition != position
+                        ) {
+                            binding.spSort.setSelection(position)
+                        }
+                    }
+                }
+            }
         }
 
-        adapter.submitList(result)
+        // 9. Mở SettingsFragment
+        binding.btnSettings.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(
+                    R.id.fragmentContainer,
+                    SettingsFragment()
+                )
+                .addToBackStack(null)
+                .commit()
+        }
 
-        binding.tvStats.text =
-            "Tổng: ${tasks.size} | Đã xong: ${tasks.count { it.isDone }}"
+        // 10. Quan sát UI State
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(
+                Lifecycle.State.STARTED
+            ) {
+                viewModel.uiState.collect { state ->
 
-        binding.tvEmpty.text =
-            if (tasks.isEmpty()) {
-                "Chưa có công việc nào"
-            } else {
-                "Không có công việc phù hợp"
+                    renderTasks(state)
+
+                    state.error?.let { message ->
+                        Toast.makeText(
+                            requireContext(),
+                            message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        viewModel.clearError()
+                    }
+                }
             }
+        }
+    }
+
+    // 11. Hiển thị danh sách và trạng thái
+    private fun renderTasks(state: TaskUiState) {
+
+        binding.btnAdd.isEnabled = !state.isLoading
+        binding.btnAdd.text =
+            if (state.isLoading) "Đang xử lý..."
+            else "Thêm"
+
+        binding.btnRefreshRemote.isEnabled = !state.isLoading
+        binding.btnRefreshRemote.text =
+            if (state.isLoading) "Đang tải..."
+            else "Refresh API"
+
+        adapter.submitList(state.tasks)
 
         binding.tvEmpty.visibility =
-            if (result.isEmpty()) View.VISIBLE else View.GONE
+            if (state.tasks.isEmpty()) View.VISIBLE
+            else View.GONE
+
+        val completed = state.tasks.count { it.isDone }
+
+        binding.tvStats.text =
+            "Đang hiển thị: ${state.tasks.size} | Hoàn thành: $completed"
     }
 
+    // 12. Giải phóng ViewBinding
     override fun onDestroyView() {
+
+        Log.d("TaskLifecycle", "TaskList: onDestroyView")
+
         binding.recyclerView.adapter = null
         _binding = null
+
         super.onDestroyView()
     }
 }

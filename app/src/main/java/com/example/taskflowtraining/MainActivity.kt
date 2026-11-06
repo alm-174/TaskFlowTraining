@@ -35,12 +35,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, TaskActivity::class.java))
         }
 
-        // 2. Mở bài 4.2
+
         b.btnOpenState.setOnClickListener {
             startActivity(Intent(this, StateActivity::class.java))
         }
 
-        // 3. Chức năng bài 4.1
+
         b.btnOpenProfile.setOnClickListener {
 
             val name = b.etName.text.toString().trim()

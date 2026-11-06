@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Nhập công việc -->
+    <!-- 1. Nhập tên công việc -->
     <EditText
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
@@ -13,15 +14,28 @@
         android:hint="Nhập tên công việc"
         android:inputType="textCapSentences" />
 
-    <!-- Thêm công việc -->
+    <!-- Chọn mức độ ưu tiên khi thêm Task -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mức độ ưu tiên:"
+        android:textStyle="bold"
+        android:paddingTop="8dp" />
+
+    <Spinner
+        android:id="@+id/spPriority"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:contentDescription="Chọn mức độ ưu tiên" />
+
+    <!-- 2. Nút thêm công việc -->
     <Button
         android:id="@+id/btnAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Thêm công việc" />
 
-
-    <!-- Tìm kiếm: Bài 6.1 -->
+    <!-- 3. Tìm kiếm công việc -->
     <EditText
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
@@ -29,7 +43,7 @@
         android:hint="Tìm kiếm công việc..."
         android:inputType="text" />
 
-    <!-- Bộ lọc: Bài 6.2 -->
+    <!-- 4. Bộ lọc trạng thái -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,7 +72,21 @@
 
     </LinearLayout>
 
-    <!-- Thống kê -->
+    <!-- 5. Sắp xếp công việc -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sắp xếp theo:"
+        android:textStyle="bold"
+        android:paddingTop="8dp" />
+
+    <Spinner
+        android:id="@+id/spSort"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:contentDescription="Sắp xếp công việc" />
+
+    <!-- 6. Thống kê -->
     <TextView
         android:id="@+id/tvStats"
         android:layout_width="match_parent"
@@ -67,7 +95,7 @@
         android:textSize="18sp"
         android:padding="8dp" />
 
-    <!-- Trạng thái danh sách trống -->
+    <!-- 7. Thông báo danh sách trống -->
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
@@ -76,11 +104,57 @@
         android:gravity="center"
         android:padding="16dp" />
 
-    <!-- Danh sách công việc -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvTotalTasks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tổng công việc: 0"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvCompletedTasks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Đã hoàn thành: 0"
+            android:textSize="18sp" />
+
+        <ProgressBar
+            android:id="@+id/progressTasks"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:max="100"
+            android:progress="0" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnRefreshRemote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Refresh API" />
+
+    <!-- 8. Danh sách công việc -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
+
+    <!-- 9. Mở Settings -->
+    <Button
+        android:id="@+id/btnSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mở Settings" />
 
 </LinearLayout>
