@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/listFragment">
+
+    <fragment
+        android:id="@+id/listFragment"
+        android:name="com.example.taskflowtraining.ui.ListFragment"
+        android:label="Danh sách công việc">
+
+        <action
+            android:id="@+id/action_list_to_detail"
+            app:destination="@id/detailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.example.taskflowtraining.ui.DetailFragment"
+        android:label="Chi tiết công việc">
+
+        <argument
+            android:name="taskId"
+            app:argType="long" />
+
+        <action
+            android:id="@+id/action_detail_to_edit"
+            app:destination="@id/editFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editFragment"
+        android:name="com.example.taskflowtraining.ui.EditFragment"
+        android:label="Sửa công việc">
+
+        <argument
+            android:name="taskId"
+            app:argType="long" />
+    </fragment>
+
+</navigation>
