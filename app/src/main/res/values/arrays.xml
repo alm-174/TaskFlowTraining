@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Dùng khi thêm công việc -->
+    <string-array name="priority_options">
+        <item>Thấp (1)</item>
+        <item>Trung bình (2)</item>
+        <item>Cao (3)</item>
+    </string-array>
+
+    <!-- Dùng khi lọc công việc -->
+    <string-array name="priority_filter_options">
+        <item>Tất cả</item>
+        <item>Thấp (1)</item>
+        <item>Trung bình (2)</item>
+        <item>Cao (3)</item>
+    </string-array>
+
+</resources>

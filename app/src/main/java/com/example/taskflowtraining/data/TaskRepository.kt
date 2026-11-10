@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.map
 
 interface TaskRepository {
     fun observeTasks(): Flow<List<Task>>
-    suspend fun add(title: String)
+    suspend fun add(title: String, priority : Int = 1)
     suspend fun setDone(id: Long, done: Boolean)
     suspend fun delete(id: Long)
+
+    suspend fun updateTitle(id: Long, newTitle: String, newPriority: Int = 1)
     suspend fun clearCompleted()
     suspend fun importSample(): Int
 }
@@ -25,8 +27,11 @@ class DefaultTaskRepository(
         return dao.observeAll().map { rows -> rows.map{it.toModel()} }
     }
 
-    override suspend fun add(title: String) {
-        dao.insert(TaskEntity(title = validateTitle(title)))
+    override suspend fun add(title: String, priority : Int) {
+        require(priority in 1..3) {
+            "Độ ưu tiên phải từ 1 đến 3"
+        }
+        dao.insert(TaskEntity(title = validateTitle(title), priority = priority))
     }
 
     override suspend fun setDone(id: Long, done: Boolean) {
@@ -36,6 +41,15 @@ class DefaultTaskRepository(
 
     override suspend fun delete(id: Long) {
         dao.findById(id)?.let { dao.delete(it) }
+    }
+
+    override suspend fun updateTitle(id: Long, newTitle: String, newPriority: Int) {
+        val old = dao.findById(id)
+            ?: throw IllegalArgumentException("Không tìm thấy công việc")
+        require(newPriority in 1..3) {
+            "Độ ưu tiên phải từ 1 đến 3"
+        }
+        dao.update(old.copy(title = validateTitle(newTitle), priority = newPriority))
     }
 
     override suspend fun clearCompleted() {

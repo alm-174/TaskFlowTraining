@@ -20,17 +20,19 @@ fun validateTitle(raw: String): String {
 }
 
 fun filterAndSort(tasks: List<Task>, query: String,
-                  filter: TaskFilter, sort: SortMode) : List<Task>
+                  filter: TaskFilter, sort: SortMode, priority: Int? =null) : List<Task>
 {
     val q = query.trim();
     val filtered  = tasks.filter { task ->
         task.title.contains(q, ignoreCase = true) &&
+                (priority == null || task.priority == priority) &&
                 when(filter){
                     TaskFilter.ALL -> true
                     TaskFilter.ACTIVE -> !task.isDone
                     TaskFilter.COMPLETED -> task.isDone
                 }
     }
+
 
     return when(sort){
         SortMode.NEWEST -> filtered.sortedByDescending { it.id }
