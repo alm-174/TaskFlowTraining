@@ -5,10 +5,9 @@ import androidx.room.Room
 import com.example.taskflowtraining.data.*
 import com.example.taskflowtraining.data.local.TaskDatabase
 import com.example.taskflowtraining.data.remote.TodoApi
-import com.example.taskflowtraining.settings.SettingsRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
+import com.example.taskflowtraining.settings.DataStoreSettingsRepository
 class TaskFlowApp : Application() {
     val database by lazy {
         Room.databaseBuilder(
@@ -31,6 +30,6 @@ class TaskFlowApp : Application() {
     }
 
     val settingsRepository by lazy {
-        SettingsRepository(applicationContext)
+        DataStoreSettingsRepository(applicationContext)
     }
 }

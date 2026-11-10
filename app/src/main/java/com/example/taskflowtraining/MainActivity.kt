@@ -6,12 +6,15 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.activity.enableEdgeToEdge
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +29,7 @@ import com.example.taskflowtraining.ui.TaskUiState
 import com.example.taskflowtraining.ui.TaskViewModel
 import kotlinx.coroutines.launch
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -37,16 +41,39 @@ class MainActivity : AppCompatActivity() {
 
     private val adapter = TaskAdapter(
         onDone = { task, done -> vm.setDone(task, done) },
-        onDelete = { task -> confirmDelete(task) }
+        onDelete = { task -> confirmDelete(task) },
+        onEdit = {task -> showEditDialog(task)}
     )
 
     private var currentState = TaskUiState()
     private var renderingSort = false
 
 
+    private val pickImage = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+
+        if (uri != null) {
+            binding.ivPreview.setImageURI(uri)
+        } else {
+            Toast.makeText(
+                this,
+                "Bạn chưa chọn ảnh",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        binding.btnPickImage.setOnClickListener {
+            pickImage.launch(
+                PickVisualMediaRequest(
+                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
+        }
         setContentView(binding.root)
         setupList()
         setupInputs()
@@ -57,6 +84,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupList() {
         binding.recyclerTasks.layoutManager = LinearLayoutManager(this)
         binding.recyclerTasks.adapter = adapter
+        binding.recyclerTasks.itemAnimator = null
     }
 
     private fun setupInputs() = with(binding){
@@ -66,7 +94,9 @@ class MainActivity : AppCompatActivity() {
                 etTitle.error = "Nhập tên công việc"
                 return@setOnClickListener
             }
-            vm.add(raw)
+            val priority = spinnerPriority.selectedItemPosition + 1
+
+            vm.add(raw, priority)
             etTitle.text?.clear()
         }
 
@@ -95,9 +125,11 @@ class MainActivity : AppCompatActivity() {
     private fun setupSpinners() {
         val filters = listOf("Tất cả", "Chưa xong", "Hoàn thành")
         val sorts = listOf("Mới nhất", "Tên A–Z")
+        val priorities = listOf( "Tất cả", "Thấp (1)", "Trung bình (2)", "Cao (3)")
 
         binding.spinnerFilter.adapter = spinnerAdapter(filters)
         binding.spinnerSort.adapter = spinnerAdapter(sorts)
+        binding.spinnerPriorityFilter.adapter = spinnerAdapter(priorities)
 
         binding.spinnerFilter.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
@@ -117,6 +149,21 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+
+        binding.spinnerPriorityFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: android.view.View?,
+                pos: Int,
+                id: Long
+            ) {
+                val priority = if (pos == 0) null else pos
+
+                vm.setPriorityFilter(priority)
+            }
+        }
 
     }
 
@@ -162,4 +209,76 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Xóa") { _, _ -> vm.delete(task) }
             .show()
     }
+
+
+    private fun showEditDialog(task: Task) {
+
+
+        val input = EditText(this).apply {
+            setText(task.title)
+            selectAll()
+        }
+
+        val prioritySpinner = Spinner(this).apply {
+
+            val priorities = listOf(
+                "Thấp (1)",
+                "Trung bình (2)",
+                "Cao (3)"
+            )
+
+            adapter = ArrayAdapter(
+                this@MainActivity,
+                android.R.layout.simple_spinner_item,
+                priorities
+            ).apply {
+                setDropDownViewResource(
+                    android.R.layout.simple_spinner_dropdown_item
+                )
+            }
+
+            setSelection((task.priority - 1).coerceIn(0, 2))
+        }
+
+
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+
+            val padding = (20 * resources.displayMetrics.density).toInt()
+            setPadding(padding, padding, padding, padding)
+
+            addView(input)
+            addView(prioritySpinner)
+        }
+
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Sửa công việc")
+            .setView(layout)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton("Lưu", null)
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setOnClickListener {
+
+                    val newTitle = input.text.toString()
+                    val newPriority =
+                        prioritySpinner.selectedItemPosition + 1
+
+                    if (newTitle.isBlank()) {
+                        input.error = "Không để trống tên"
+                    } else if (newTitle.trim().length > 100) {
+                        input.error = "Tên tối đa 100 ký tự"
+                    } else {
+                        vm.updateTask(task, newTitle, newPriority)
+                        dialog.dismiss()
+                    }
+                }
+        }
+
+        dialog.show()
+    }
+
 }

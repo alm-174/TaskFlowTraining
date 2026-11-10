@@ -22,11 +22,22 @@
         android:inputType="textCapSentences"
         android:maxLength="100"/>
 
+    <Spinner
+        android:id="@+id/spinnerPriority"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:entries="@array/priority_options" />
+
     <Button
         android:id="@+id/btnAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Thêm công việc" />
+    <Spinner
+        android:id="@+id/spinnerPriorityFilter"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:entries="@array/priority_filter_options" />
     <Spinner
         android:id="@+id/spinnerFilter"
         android:layout_width="match_parent"
@@ -90,4 +101,17 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingBottom="16dp" />
+
+    <Button
+        android:id="@+id/btnPickImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn ảnh" />
+
+    <ImageView
+        android:id="@+id/ivPreview"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:contentDescription="Ảnh đã chọn"
+        android:scaleType="centerCrop" />
 </LinearLayout>

@@ -9,7 +9,8 @@ import com.example.taskflowtraining.databinding.ItemTaskBinding
 import com.example.taskflowtraining.model.Task
 class TaskAdapter(
     private val onDone: (Task, Boolean) -> Unit,
-    private val onDelete: (Task) -> Unit
+    private val onDelete: (Task) -> Unit,
+    private val onEdit: (Task) -> Unit
 ) : ListAdapter<Task, TaskAdapter.TaskHolder>(DIFF) {
 
     companion object {
@@ -42,7 +43,11 @@ class TaskAdapter(
             checkDone.setOnCheckedChangeListener { _, checked ->
                 onDone(task, checked)
             }
+
+            tvPriority.text = "(${task.priority})"
             btnDelete.setOnClickListener { onDelete(task) }
+
+            btnEdit.setOnClickListener { onEdit(task) }
         }
     }
 
