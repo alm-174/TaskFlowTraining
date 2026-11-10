@@ -11,6 +11,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.IOException
 import retrofit2.HttpException
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class TaskUiState(
     val tasks: List<Task> = emptyList(),
@@ -23,7 +25,9 @@ data class TaskUiState(
     val message: String? = null
 )
 
-class TaskViewModel(
+
+@HiltViewModel
+class TaskViewModel @Inject constructor(
     private val repo: TaskRepository,
     private val settings: SettingsRepository
 ) : ViewModel() {
@@ -133,14 +137,4 @@ class TaskViewModel(
 
 
 
-    class TaskViewModelFactory(
-        private val repo: TaskRepository,
-        private val settings: SettingsRepository
-    ) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            require(modelClass.isAssignableFrom(TaskViewModel::class.java))
-            @Suppress("UNCHECKED_CAST")
-            return TaskViewModel(repo, settings) as T
-        }
-    }
 }

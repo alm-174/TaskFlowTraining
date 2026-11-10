@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.devtools.ksp")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -18,7 +19,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner =
-            "androidx.test.runner.AndroidJUnitRunner"
+           //"androidx.test.runner.AndroidJUnitRunner"
+        "com.example.taskflowtraining.HiltTestRunner"
     }
 
     buildTypes {
@@ -81,4 +83,11 @@ dependencies {
     // Android Testing
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    // Hilt Dependency Injection
+    implementation("com.google.dagger:hilt-android:2.59.2")
+    ksp("com.google.dagger:hilt-compiler:2.59.2")
+
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.59.2")
+    kspAndroidTest("com.google.dagger:hilt-compiler:2.59.2")
 }

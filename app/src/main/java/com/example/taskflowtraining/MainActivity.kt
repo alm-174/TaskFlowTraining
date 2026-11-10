@@ -9,9 +9,6 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
-import android.widget.Toast
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -27,17 +24,15 @@ import com.example.taskflowtraining.model.TaskFilter
 import com.example.taskflowtraining.ui.TaskAdapter
 import com.example.taskflowtraining.ui.TaskUiState
 import com.example.taskflowtraining.ui.TaskViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val vm: TaskViewModel by viewModels {
-        val app = application as TaskFlowApp
-        TaskViewModel.TaskViewModelFactory(app.taskRepository, app.settingsRepository)
-    }
+    private val vm: TaskViewModel by viewModels()
 
     private val adapter = TaskAdapter(
         onDone = { task, done -> vm.setDone(task, done) },
