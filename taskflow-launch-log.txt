@@ -1,0 +1,15 @@
+﻿
+  --------- beginning of main
+> 11-09 11:50:49.835 I/adbd    ( 1987): adbd service requested 'shell,v2,TERM=xterm-256color,raw:am start -n com.example.taskflowtraining/.MainActivity'
+  --------- beginning of system
+> 11-09 11:50:49.891 W/ActivityTaskManager(  700): callingPackage for (uid=2000, pid=20898) has no WPC
+  11-09 11:50:49.892 V/GrammaticalInflectionUtils(  700): AttributionSource: android.content.AttributionSource@f25d2a1a does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+  11-09 11:50:49.892 W/TransitionChain(  700): Combining startAct into #322(OPEN|R|0x0) from startAct
+> 11-09 11:50:49.897 V/ActivityTaskManager(  700): TaskLaunchParamsModifier: phase=3 task=Task{13f60e7 #96 type=standard A=10235:com.example.taskflowtraining} activity=ActivityRecord{262322649 u0 
+com.example.taskflowtraining/.MainActivity t-1} display-from-task=0 display-id=0 task-display-area-windowing-mode=1 suggested-display-area=DefaultTaskDisplayArea@182828482 inherit-from-task=fullscreen 
+non-freeform-task-display-area display-area=DefaultTaskDisplayArea@182828482 skip-bounds-fullscreen
+> 11-09 11:50:49.897 I/ActivityTaskManager(  700): START u0 {flg=0x10000000 xflg=0x5 cmp=com.example.taskflowtraining/.MainActivity} with LAUNCH_MULTIPLE from uid 2000 (com.android.shell) (BAL_ALLOW_PERMISSION) result code=0
+  11-09 11:50:52.902 E/TaskPersister(  700): File error accessing recents directory (directory doesn't exist?).
+  11-09 11:50:53.019 I/adbd    ( 1987): adbd service requested 'shell,v2:export ANDROID_LOG_TAGS=''; exec logcat '-d' '-v' 'time''
+
+
