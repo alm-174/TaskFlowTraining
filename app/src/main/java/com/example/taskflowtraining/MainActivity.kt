@@ -49,31 +49,11 @@ class MainActivity : AppCompatActivity() {
     private var renderingSort = false
 
 
-    private val pickImage = registerForActivityResult(
-        ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
 
-        if (uri != null) {
-            binding.ivPreview.setImageURI(uri)
-        } else {
-            Toast.makeText(
-                this,
-                "Bạn chưa chọn ảnh",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        binding.btnPickImage.setOnClickListener {
-            pickImage.launch(
-                PickVisualMediaRequest(
-                    ActivityResultContracts.PickVisualMedia.ImageOnly
-                )
-            )
-        }
         setContentView(binding.root)
         setupList()
         setupInputs()
