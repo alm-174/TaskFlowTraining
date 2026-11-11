@@ -59,7 +59,7 @@ class TaskViewModel @Inject constructor(
     ) { list, loading, err, msg ->
         TaskUiState(
             tasks = list.tasks, query = list.query,
-            filter = list.filter, sort = list.sort,
+            filter = list.filter, sort = list.sort, priorityFilter = list.priorityFilter,
             isLoading = loading, error = err, message = msg
         )
     }.stateIn(

@@ -21,6 +21,9 @@ interface TaskDao{
     fun observeAll(): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM tasks WHERE id = :id LIMIT 1")
+    fun observeById(id: Long): Flow<TaskEntity?>
+
+    @Query("SELECT * FROM tasks WHERE id = :id LIMIT 1")
     suspend fun findById(id: Long): TaskEntity?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

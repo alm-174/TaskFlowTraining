@@ -10,7 +10,8 @@ import com.example.taskflowtraining.model.Task
 class TaskAdapter(
     private val onDone: (Task, Boolean) -> Unit,
     private val onDelete: (Task) -> Unit,
-    private val onEdit: (Task) -> Unit
+    private val onEdit: (Task) -> Unit,
+    private val onTaskClick: (Task) -> Unit
 ) : ListAdapter<Task, TaskAdapter.TaskHolder>(DIFF) {
 
     companion object {
@@ -48,6 +49,10 @@ class TaskAdapter(
             btnDelete.setOnClickListener { onDelete(task) }
 
             btnEdit.setOnClickListener { onEdit(task) }
+
+            tvTitle.setOnClickListener {
+                onTaskClick(task)
+            }
         }
     }
 

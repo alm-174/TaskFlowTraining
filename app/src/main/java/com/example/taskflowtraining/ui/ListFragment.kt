@@ -13,12 +13,14 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.taskflowtraining.databinding.FragmentListBinding
 import com.example.taskflowtraining.model.SortMode
@@ -26,9 +28,10 @@ import com.example.taskflowtraining.model.Task
 import com.example.taskflowtraining.model.TaskFilter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import com.example.taskflowtraining.R
 
 @AndroidEntryPoint
-class ListFragment : Fragment() {
+class ListFragment : Fragment(R.layout.fragment_detail) {
 
     private var _binding: FragmentListBinding? = null
 
@@ -46,6 +49,9 @@ class ListFragment : Fragment() {
         },
         onEdit = { task ->
             showEditDialog(task)
+        },
+        onTaskClick = { task ->
+            openTaskDetail(task)
         }
     )
 
@@ -430,6 +436,17 @@ class ListFragment : Fragment() {
         }
 
         dialog.show()
+    }
+
+    private fun openTaskDetail(task : Task){
+        val args = bundleOf(
+            "taskId" to task.id
+        )
+
+        findNavController().navigate(
+            R.id.action_list_to_detail,
+            args
+        )
     }
 
     override fun onDestroyView() {

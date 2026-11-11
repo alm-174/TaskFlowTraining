@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 
 interface TaskRepository {
     fun observeTasks(): Flow<List<Task>>
+    fun observeTaskById(id: Long): Flow<Task?>
     suspend fun add(title: String, priority : Int = 1)
     suspend fun setDone(id: Long, done: Boolean)
     suspend fun delete(id: Long)
@@ -25,6 +26,11 @@ class DefaultTaskRepository(
 ) : TaskRepository{
     override fun observeTasks(): Flow<List<Task>> {
         return dao.observeAll().map { rows -> rows.map{it.toModel()} }
+    }
+
+    override fun observeTaskById(id: Long): Flow<Task?> {
+        return dao.observeById(id).map { entity ->
+            entity?.toModel()}
     }
 
     override suspend fun add(title: String, priority : Int) {
