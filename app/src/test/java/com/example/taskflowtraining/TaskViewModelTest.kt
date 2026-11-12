@@ -114,8 +114,9 @@ class TaskViewModelTest {
         // Assert
         assertFalse(vm.uiState.value.isLoading)
 
-        assertTrue(
-            vm.uiState.value.error?.contains("Lỗi mạng") == true
+        assertEquals(
+            R.string.error_network,
+            vm.uiState.value.error?.resourceId
         )
 
         assertEquals(0, fakeRepo.currentTasks().size)

@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -22,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.work.WorkInfo
 import com.example.taskflowtraining.databinding.FragmentListBinding
 import com.example.taskflowtraining.model.SortMode
 import com.example.taskflowtraining.model.Task
@@ -31,7 +33,7 @@ import kotlinx.coroutines.launch
 import com.example.taskflowtraining.R
 
 @AndroidEntryPoint
-class ListFragment : Fragment(R.layout.fragment_detail) {
+class ListFragment : Fragment() {
 
     private var _binding: FragmentListBinding? = null
 
@@ -99,7 +101,7 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
             val raw = etTitle.text.toString()
 
             if (raw.isBlank()) {
-                etTitle.error = "Nhập tên công việc"
+                etTitle.error = getString(R.string.title_required)
                 return@setOnClickListener
             }
 
@@ -139,9 +141,9 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
 
         btnClear.setOnClickListener {
             AlertDialog.Builder(requireContext())
-                .setTitle("Xóa công việc đã hoàn thành?")
-                .setNegativeButton("Hủy", null)
-                .setPositiveButton("Xóa") { _, _ ->
+                .setTitle(getString(R.string.clear_confirm))
+                .setNegativeButton(getString(R.string.cancel), null)
+                .setPositiveButton(getString(R.string.delete)) { _, _ ->
                     vm.clearCompleted()
                 }
                 .show()
@@ -156,21 +158,21 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
     private fun setupSpinners() {
 
         val filters = listOf(
-            "Tất cả",
-            "Chưa xong",
-            "Hoàn thành"
+            getString(R.string.all),
+            getString(R.string.active),
+            getString(R.string.completed)
         )
 
         val sorts = listOf(
-            "Mới nhất",
-            "Tên A–Z"
+            getString(R.string.newest),
+            getString(R.string.title_sort)
         )
 
         val priorities = listOf(
-            "Tất cả",
-            "Thấp (1)",
-            "Trung bình (2)",
-            "Cao (3)"
+            getString(R.string.all),
+            getString(R.string.priority_low_option),
+            getString(R.string.priority_medium_option),
+            getString(R.string.priority_high_option)
         )
 
         binding.spinnerFilter.adapter =
@@ -280,9 +282,85 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
             viewLifecycleOwner.repeatOnLifecycle(
                 Lifecycle.State.STARTED
             ) {
-                vm.uiState.collect { state ->
-                    render(state)
+
+                // 1. Theo dõi danh sách Task và CRUD
+                launch {
+                    vm.uiState.collect { state ->
+                        render(state)
+                    }
                 }
+
+                // 2. Theo dõi trạng thái Worker
+                launch {
+                    vm.importWorkInfo.collect { workInfo ->
+                        renderImportState(workInfo)
+                    }
+                }
+
+                // 3. Hiển thị kết quả Import một lần
+                launch {
+                    vm.importResultToShow.collect { workInfo ->
+                        if (workInfo != null) {
+                            val message = when (workInfo.state) {
+                                WorkInfo.State.SUCCEEDED ->
+                                    getString(R.string.import_success)
+
+                                WorkInfo.State.FAILED ->
+                                    getString(R.string.import_failed)
+
+                                WorkInfo.State.CANCELLED ->
+                                    getString(R.string.import_cancelled)
+
+                                else -> null
+                            }
+
+                            if (message != null) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+
+                                vm.acknowledgeImportResult(workInfo.id)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun renderImportState(workInfo: WorkInfo?) {
+        val isImportActive = workInfo != null &&
+                !workInfo.state.isFinished
+
+        binding.btnImport.isEnabled =
+            !currentState.isLoading && !isImportActive
+
+        when (workInfo?.state) {
+            WorkInfo.State.ENQUEUED -> {
+                binding.btnImport.text = getString(R.string.import_waiting)
+            }
+
+            WorkInfo.State.RUNNING -> {
+                binding.btnImport.text = getString(R.string.import_running)
+            }
+
+            WorkInfo.State.SUCCEEDED -> {
+                binding.btnImport.text = getString(R.string.import_action)
+            }
+
+            WorkInfo.State.FAILED -> {
+                binding.btnImport.text = getString(R.string.import_action)
+            }
+
+            WorkInfo.State.CANCELLED -> {
+                binding.btnImport.text = getString(R.string.import_action)
+            }
+
+            else -> {
+                binding.btnImport.text = getString(R.string.import_action)
             }
         }
     }
@@ -297,7 +375,11 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
         progressBar.isVisible = state.isLoading
 
         btnAdd.isEnabled = !state.isLoading
-        btnImport.isEnabled = !state.isLoading
+
+        btnImport.isEnabled =
+            !state.isLoading &&
+                    vm.importWorkInfo.value?.state?.isFinished != false
+
         btnClear.isEnabled = !state.isLoading
 
         tvEmpty.isVisible =
@@ -306,7 +388,7 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
         val feedback = state.error ?: state.message
 
         tvFeedback.isVisible = feedback != null
-        tvFeedback.text = feedback.orEmpty()
+        tvFeedback.text = feedback?.resolve(requireContext()).orEmpty()
 
         renderingControls = true
 
@@ -337,10 +419,10 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
     // 6. Xác nhận xóa Task
     private fun confirmDelete(task: Task) {
         AlertDialog.Builder(requireContext())
-            .setTitle("Xóa công việc?")
+            .setTitle(getString(R.string.delete_confirm))
             .setMessage(task.title)
-            .setNegativeButton("Hủy", null)
-            .setPositiveButton("Xóa") { _, _ ->
+            .setNegativeButton(getString(R.string.cancel), null)
+            .setPositiveButton(getString(R.string.delete)) { _, _ ->
                 vm.delete(task)
             }
             .show()
@@ -357,9 +439,9 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
         val prioritySpinner = Spinner(requireContext()).apply {
 
             val priorities = listOf(
-                "Thấp (1)",
-                "Trung bình (2)",
-                "Cao (3)"
+                getString(R.string.priority_low_option),
+                getString(R.string.priority_medium_option),
+                getString(R.string.priority_high_option)
             )
 
             adapter = ArrayAdapter(
@@ -395,13 +477,13 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
         }
 
         val dialog = AlertDialog.Builder(requireContext())
-            .setTitle("Sửa công việc")
+            .setTitle(getString(R.string.edit_task))
             .setView(layout)
             .setNegativeButton(
                 android.R.string.cancel,
                 null
             )
-            .setPositiveButton("Lưu", null)
+            .setPositiveButton(getString(R.string.save), null)
             .create()
 
         dialog.setOnShowListener {
@@ -416,11 +498,11 @@ class ListFragment : Fragment(R.layout.fragment_detail) {
 
                     when {
                         newTitle.isBlank() -> {
-                            input.error = "Không để trống tên"
+                            input.error = getString(R.string.title_empty)
                         }
 
                         newTitle.length > 100 -> {
-                            input.error = "Tên tối đa 100 ký tự"
+                            input.error = getString(R.string.title_too_long)
                         }
 
                         else -> {

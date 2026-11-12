@@ -45,7 +45,7 @@ class TaskAdapter(
                 onDone(task, checked)
             }
 
-            tvPriority.text = "(${task.priority})"
+            tvPriority.text = root.context.getString(com.example.taskflowtraining.R.string.priority_badge, task.priority)
             btnDelete.setOnClickListener { onDelete(task) }
 
             btnEdit.setOnClickListener { onEdit(task) }

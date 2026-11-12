@@ -86,7 +86,7 @@ class EditFragment : Fragment(R.layout.fragment_edit) {
                         is EditSaveState.Error -> {
                             binding.btnSave.isEnabled = true
                             binding.tvMessage.visibility = View.VISIBLE
-                            binding.tvMessage.text = state.message
+                            binding.tvMessage.text = state.message.resolve(requireContext())
                         }
                     }
                 }
@@ -127,12 +127,12 @@ class EditFragment : Fragment(R.layout.fragment_edit) {
 
             is EditUiState.NotFound -> {
                 tvMessage.visibility = View.VISIBLE
-                tvMessage.text = "Không tìm thấy công việc"
+                tvMessage.text = getString(R.string.task_not_found)
             }
 
             is EditUiState.Error -> {
                 tvMessage.visibility = View.VISIBLE
-                tvMessage.text = state.message
+                tvMessage.text = state.message.resolve(requireContext())
             }
         }
     }

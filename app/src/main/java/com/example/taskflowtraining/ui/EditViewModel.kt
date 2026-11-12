@@ -1,5 +1,6 @@
 package com.example.taskflowtraining.ui
 
+import com.example.taskflowtraining.R
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,7 +30,7 @@ sealed interface EditUiState {
     data object NotFound : EditUiState
 
     data class Error(
-        val message: String
+        val message: UiText
     ) : EditUiState
 }
 
@@ -37,7 +38,7 @@ sealed interface EditSaveState {
     data object Idle : EditSaveState
     data object Saving : EditSaveState
     data object Success : EditSaveState
-    data class Error(val message: String) : EditSaveState
+    data class Error(val message: UiText) : EditSaveState
 }
 
 @HiltViewModel
@@ -78,7 +79,7 @@ class EditViewModel @Inject constructor(
                 throw e
             } catch (e: Exception) {
                 _saveState.value = EditSaveState.Error(
-                    e.message ?: "Không thể lưu công việc"
+                    e.toUiText(R.string.error_save)
                 )
             }
         }
@@ -96,7 +97,7 @@ class EditViewModel @Inject constructor(
             .catch { exception ->
                 emit(
                     EditUiState.Error(
-                        exception.message ?: "Không thể tải công việc"
+                        exception.toUiText(R.string.error_load)
                     )
                 )
             }

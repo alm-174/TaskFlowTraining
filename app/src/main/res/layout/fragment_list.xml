@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TaskFlow Training"
+        android:text="@string/training_title"
         android:textSize="24sp"
         android:textStyle="bold" />
     
@@ -18,7 +18,7 @@
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tên công việc (tối da 100 ký tự)"
+        android:hint="@string/title_hint"
         android:inputType="textCapSentences"
         android:maxLength="100"/>
 
@@ -32,7 +32,7 @@
         android:id="@+id/btnAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Thêm công việc" />
+        android:text="@string/add_task" />
     <Spinner
         android:id="@+id/spinnerPriorityFilter"
         android:layout_width="match_parent"
@@ -52,7 +52,7 @@
         android:id="@+id/etSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tìm kiếm"
+        android:hint="@string/search"
         android:inputType="text" />
 
     <LinearLayout
@@ -64,13 +64,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Import mẫu" />
+            android:text="@string/import_sample" />
         <Button
             android:id="@+id/btnClear"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Xóa đã xong" />
+            android:text="@string/clear_completed" />
     </LinearLayout>
 
     <ProgressBar
@@ -91,7 +91,7 @@
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chưa có công việc phù hợp"
+        android:text="@string/empty_tasks"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView

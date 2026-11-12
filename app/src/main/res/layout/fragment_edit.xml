@@ -10,7 +10,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/baseline_arrow_back_24"
-        android:contentDescription="Quay lại"
+        android:contentDescription="@string/back"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="12dp"
         android:scaleType="fitCenter"/>
@@ -19,7 +19,7 @@
         android:id="@+id/etTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tên công việc (tối da 100 ký tự)"
+        android:hint="@string/title_hint"
         android:inputType="textCapSentences|textMultiLine"
         android:minLines="2"
         android:maxLines="5"
@@ -35,7 +35,7 @@
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Lưu Công Việc" />
+        android:text="@string/save_task" />
 
     <ProgressBar
         android:id="@+id/progressLoading"

@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/listFragment"
         android:name="com.example.taskflowtraining.ui.ListFragment"
-        android:label="Danh sách công việc">
+        android:label="@string/screen_list">
 
         <action
             android:id="@+id/action_list_to_detail"
@@ -18,7 +18,7 @@
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.example.taskflowtraining.ui.DetailFragment"
-        android:label="Chi tiết công việc">
+        android:label="@string/screen_detail">
 
         <argument
             android:name="taskId"
@@ -32,7 +32,7 @@
     <fragment
         android:id="@+id/editFragment"
         android:name="com.example.taskflowtraining.ui.EditFragment"
-        android:label="Sửa công việc">
+        android:label="@string/edit_task">
 
         <argument
             android:name="taskId"

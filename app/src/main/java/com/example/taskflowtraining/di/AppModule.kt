@@ -2,8 +2,10 @@ package com.example.taskflowtraining.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.example.taskflowtraining.data.DefaultTaskRepository
 import com.example.taskflowtraining.data.TaskRepository
+import com.example.taskflowtraining.data.local.MIGRATION_1_2
 import com.example.taskflowtraining.data.local.TaskDatabase
 import com.example.taskflowtraining.data.remote.TodoApi
 import com.example.taskflowtraining.settings.DataStoreSettingsRepository
@@ -30,7 +32,8 @@ object AppModule {
             context,
             TaskDatabase::class.java,
             "taskflow.db"
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2).build()
     }
 
     @Provides
@@ -63,5 +66,13 @@ object AppModule {
         @ApplicationContext context: Context
     ): SettingsRepository {
         return DataStoreSettingsRepository(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(
+        @ApplicationContext context: Context
+    ): WorkManager {
+        return WorkManager.getInstance(context)
     }
 }

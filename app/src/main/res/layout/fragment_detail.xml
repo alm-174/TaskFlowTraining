@@ -10,16 +10,18 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/baseline_arrow_back_24"
-        android:contentDescription="Quay lại"
+        android:contentDescription="@string/back"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="12dp"
         android:scaleType="fitCenter"/>
+
 
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Task Detail"
+        android:text="@string/screen_detail"
+        android:accessibilityHeading="true"
         android:textSize="20sp"
         android:textStyle="bold"
         android:breakStrategy="high_quality"
@@ -50,11 +52,38 @@
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
-    <Button
-        android:id="@+id/btnEdit"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="Sửa công việc" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnEdit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/edit_task" />
+        <Button
+            android:id="@+id/btnReminder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/reminder" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnChoosePhoto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/choose_photo" />
+
+    <ImageView
+        android:id="@+id/ivTaskPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/task_photo" />
+
 
 </LinearLayout>

@@ -3,17 +3,17 @@
 
     <!-- Dùng khi thêm công việc -->
     <string-array name="priority_options">
-        <item>Thấp (1)</item>
-        <item>Trung bình (2)</item>
-        <item>Cao (3)</item>
+        <item>@string/priority_low_option</item>
+        <item>@string/priority_medium_option</item>
+        <item>@string/priority_high_option</item>
     </string-array>
 
     <!-- Dùng khi lọc công việc -->
     <string-array name="priority_filter_options">
-        <item>Tất cả</item>
-        <item>Thấp (1)</item>
-        <item>Trung bình (2)</item>
-        <item>Cao (3)</item>
+        <item>@string/all</item>
+        <item>@string/priority_low_option</item>
+        <item>@string/priority_medium_option</item>
+        <item>@string/priority_high_option</item>
     </string-array>
 
 </resources>

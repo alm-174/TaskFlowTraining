@@ -12,7 +12,9 @@ data class TaskEntity(
     val title: String,
     val isDone: Boolean = false,
     val priority: Int = 1,
-    val remoteId: Int? = null
+    val remoteId: Int? = null,
+    @ColumnInfo(defaultValue = "''")
+    val description: String = ""
 )
 
 @Dao
@@ -39,7 +41,7 @@ interface TaskDao{
     suspend fun deleteCompleted()
 }
 
-@Database(entities = [TaskEntity::class], version = 1,
+@Database(entities = [TaskEntity::class], version = 2,
     exportSchema = true)
 abstract class TaskDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao

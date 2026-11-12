@@ -1,5 +1,6 @@
 package com.example.taskflowtraining.ui
 
+import com.example.taskflowtraining.R
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,7 +24,7 @@ sealed interface DetailUiState {
     data object NotFound : DetailUiState
 
     data class Error(
-        val message: String
+        val message: UiText
     ) : DetailUiState
 }
 
@@ -50,7 +51,7 @@ class DetailViewModel @Inject constructor(
             .catch { exception ->
                 emit(
                     DetailUiState.Error(
-                        exception.message ?: "Không thể tải công việc"
+                        exception.toUiText(R.string.error_load)
                     )
                 )
             }
